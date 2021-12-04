@@ -1,1 +1,1 @@
-# markov_autotext
+# Markov's chain automatic text generator
