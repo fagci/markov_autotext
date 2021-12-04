@@ -10,16 +10,29 @@ FILE = Path(__file__).resolve().parent / 'text.txt'
 class AutoText():
     def __init__(self, file: Path, n: int, split_reg=r'\b'):
         self.chain = defaultdict(set)
+        buf = []
 
         with file.open() as f:
             for line in f:
                 if not line.strip():
                     continue
+
                 line = line.replace('\n', ' ')
-                parts = split(split_reg, line)[1:-1]
-                for i in range(len(parts) - n):
-                    *cond, state = parts[i:i + n + 1]
-                    self.chain[tuple(cond)].add(state)
+
+                parts = split(split_reg, line)
+
+                # remove empty "words"
+                parts = list(filter(len, parts))
+
+                buf.extend(parts)
+
+                if len(buf) >= n:
+                    for i in range(len(buf) - n):
+                        *cond, state = buf[i:i + n + 1]
+                        self.chain[tuple(cond)].add(state)
+
+                    # leave last n - 1 "words" for next iteration
+                    buf = buf[-n + 1:]
 
     def generate(self, max_count):
         self.last_state = self.random_state()
