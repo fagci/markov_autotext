@@ -3,6 +3,7 @@ from collections import defaultdict
 from pathlib import Path
 from random import choice
 from re import split
+from string import punctuation
 
 FILE = Path(__file__).resolve().parent / 'text.txt'
 
@@ -36,13 +37,10 @@ class AutoText():
 
     def generate(self, max_count):
         self.last_state = self.random_state()
+        start = list(self.last_state)
+        autotext = list(self.gen(max_count))
 
-        text = list(self.last_state)
-
-        for word in self.gen(max_count):
-            text.append(word)
-
-        return ''.join(text)
+        return ''.join(start + autotext)
 
     def gen(self, max_count):
         for _ in range(max_count):
@@ -53,7 +51,13 @@ class AutoText():
                 self.last_state = self.last_state[1:] + (word, )
 
     def random_state(self):
-        return choice(list(self.chain.keys()))
+        conditions = self.chain.keys()
+        return choice(list(filter(self.is_upper_word, conditions)))
+
+    @staticmethod
+    def is_upper_word(s):
+        w = s[0].strip()
+        return w and w[0] not in punctuation and w[0] == w[0].upper()
 
 
 def main():
