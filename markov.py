@@ -13,6 +13,8 @@ class AutoText():
 
         with file.open() as f:
             for line in f:
+                if not line.strip():
+                    continue
                 line = line.replace('\n', ' ')
                 parts = split(split_reg, line)[1:-1]
                 for i in range(len(parts) - n):
